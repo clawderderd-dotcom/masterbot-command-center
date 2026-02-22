@@ -24,11 +24,11 @@ export function OverviewPage() {
   }, [dash.bump]);
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <div className="text-lg font-semibold">Command Center Overview</div>
-          <div className="text-sm text-slate-500">Gateway + tasks status at a glance.</div>
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="min-w-0">
+          <div className="text-balance text-xl font-semibold tracking-tight">Overview</div>
+          <div className="mt-1 text-sm text-muted-foreground">Gateway + tasks status at a glance.</div>
         </div>
         <Button asChild>
           <Link to="/tasks?new=1">Start new task</Link>
@@ -43,7 +43,7 @@ export function OverviewPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-semibold">{dash.gatewayConnected ? "Connected" : "Offline"}</div>
-            {dash.lastError ? <div className="mt-2 text-xs text-amber-600">{dash.lastError}</div> : null}
+            {dash.lastError ? <div className="mt-2 text-xs text-warning">{dash.lastError}</div> : null}
           </CardContent>
         </Card>
 
@@ -74,7 +74,7 @@ export function OverviewPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-semibold">{counts.doneToday}</div>
-            <div className="mt-1 text-xs text-slate-500">Total: {counts.total}</div>
+            <div className="mt-1 text-xs text-muted-foreground">Total: {counts.total}</div>
           </CardContent>
         </Card>
       </div>
@@ -85,9 +85,8 @@ export function OverviewPage() {
           <CardDescription>Basic event-driven refresh (more coming soon)</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-sm text-slate-500">
-            This MVP streams gateway events into task run logs; next steps: activity feed, command palette, and richer
-            status transitions.
+          <div className="text-sm text-muted-foreground">
+            This MVP streams gateway events into task run logs. Next steps: richer activity feed and state transitions.
           </div>
         </CardContent>
       </Card>
