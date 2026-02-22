@@ -34,7 +34,9 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Separator } from "./ui/separator";
-import { CommandPalette, type CommandItem } from "./CommandPalette";
+import { CommandPalette } from "./CommandPalette";
+import { ToastProviderState } from "./ui/use-toast";
+import { Toaster } from "./ui/toaster";
 
 type NavItem = {
   to: string;
@@ -71,7 +73,6 @@ function NavGroup({ title, items, onNavigate }: { title: string; items: NavItem[
             cn(
               "group flex items-center gap-2 rounded-lg px-2 py-2 text-sm",
               "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground",
-              "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar outline-none",
               isActive && "bg-sidebar-accent text-foreground",
             )
           }
@@ -118,18 +119,20 @@ export function Layout() {
   const [paletteOpen, setPaletteOpen] = React.useState(false);
 
   React.useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const k = e.key.toLowerCase();
+      if ((e.ctrlKey || e.metaKey) && k === "k") {
+        e.preventDefault();
+        setPaletteOpen(true);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  React.useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname]);
-
-  const commandItems = React.useMemo<CommandItem[]>(() => {
-    return navItems.map((it) => ({
-      id: `nav:${it.to}`,
-      label: `Go to ${it.label}`,
-      keywords: `${it.section} ${it.to}`,
-      icon: it.icon,
-      run: () => nav(it.to),
-    }));
-  }, [nav]);
 
   const sidebar = (
     <aside className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
@@ -159,10 +162,10 @@ export function Layout() {
       </div>
 
       <div className="flex-1 overflow-y-auto px-2 pb-3">
-        <NavGroup title="Workspace" items={navItems.filter((x) => x.section === "Workspace")} />
-        <NavGroup title="System" items={navItems.filter((x) => x.section === "System")} />
-        <NavGroup title="Automation" items={navItems.filter((x) => x.section === "Automation")} />
-        <NavGroup title="Observability" items={navItems.filter((x) => x.section === "Observability")} />
+        <NavGroup title="Workspace" items={navItems.filter((x) => x.section === "Workspace")} onNavigate={() => setMobileOpen(false)} />
+        <NavGroup title="System" items={navItems.filter((x) => x.section === "System")} onNavigate={() => setMobileOpen(false)} />
+        <NavGroup title="Automation" items={navItems.filter((x) => x.section === "Automation")} onNavigate={() => setMobileOpen(false)} />
+        <NavGroup title="Observability" items={navItems.filter((x) => x.section === "Observability")} onNavigate={() => setMobileOpen(false)} />
       </div>
 
       <div className="px-3 pb-3">
@@ -181,85 +184,88 @@ export function Layout() {
   );
 
   return (
-    <div className="min-h-dvh bg-background text-foreground">
-      <CommandPalette items={commandItems} open={paletteOpen} onOpenChange={setPaletteOpen} />
+    <ToastProviderState>
+      <div className="min-h-dvh bg-background text-foreground">
+        <div className="mx-auto flex min-h-dvh w-full max-w-[1400px]">
+          <div className="hidden w-[280px] shrink-0 border-r border-border/70 md:block">{sidebar}</div>
 
-      <div className="mx-auto flex min-h-dvh w-full max-w-[1400px]">
-        <div className="hidden w-[280px] shrink-0 border-r border-border/70 md:block">{sidebar}</div>
+          <Dialog open={mobileOpen} onOpenChange={setMobileOpen}>
+            <DialogContent className="h-[90vh] max-w-[320px] p-0">{sidebar}</DialogContent>
+          </Dialog>
 
-        <Dialog open={mobileOpen} onOpenChange={setMobileOpen}>
-          <DialogContent className="h-[90vh] max-w-[320px] p-0">{sidebar}</DialogContent>
-        </Dialog>
+          <div className="min-w-0 flex-1">
+            <header className="sticky top-0 z-30 border-b border-border/70 bg-background/70 backdrop-blur">
+              <div className="flex items-center justify-between gap-3 px-4 py-3 md:px-6">
+                <div className="flex min-w-0 items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="md:hidden"
+                    onClick={() => setMobileOpen(true)}
+                    aria-label="Open navigation"
+                  >
+                    <Menu />
+                  </Button>
 
-        <div className="min-w-0 flex-1">
-          <header className="sticky top-0 z-30 border-b border-border/70 bg-background/70 backdrop-blur">
-            <div className="flex items-center justify-between gap-3 px-4 py-3 md:px-6">
-              <div className="flex min-w-0 items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="md:hidden"
-                  onClick={() => setMobileOpen(true)}
-                  aria-label="Open navigation"
-                >
-                  <Menu />
-                </Button>
-
-                <div className="min-w-0">
-                  <div className="truncate text-sm font-semibold">Command Center</div>
-                  <div className="truncate text-xs text-muted-foreground">Local-first • Dark-mode-first</div>
-                </div>
-              </div>
-
-              <div className="hidden min-w-[320px] max-w-[520px] flex-1 md:flex">
-                <button
-                  onClick={() => setPaletteOpen(true)}
-                  className={cn(
-                    "flex w-full items-center gap-2 rounded-xl border border-border/70 bg-card px-3 py-2",
-                    "text-left text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-                    "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background outline-none",
-                  )}
-                >
-                  <Search className="size-4" />
-                  <span className="flex-1">Search tasks, actions, pages…</span>
-                  <span className="rounded-md bg-muted px-2 py-0.5 text-[11px]">Ctrl K</span>
-                </button>
-              </div>
-
-              <div className="flex shrink-0 items-center gap-2">
-                <div className="hidden lg:block">
-                  <ConnectionPill ws={dash.wsConnected} gateway={dash.gatewayConnected} />
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-semibold">Command Center</div>
+                    <div className="truncate text-xs text-muted-foreground">Local-first • Dark-mode-first</div>
+                  </div>
                 </div>
 
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="gap-2">
-                      {theme === "dark" ? <Moon /> : <Sun />}
-                      <span className="hidden sm:inline">Theme</span>
-                      <ChevronDown className="size-4 text-muted-foreground" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Appearance</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onSelect={() => setTheme("system")}>System</DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => setTheme("dark")}>Dark</DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => setTheme("light")}>Light</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <div className="hidden min-w-[320px] max-w-[520px] flex-1 md:flex">
+                  <button
+                    onClick={() => setPaletteOpen(true)}
+                    className={cn(
+                      "flex w-full items-center gap-2 rounded-xl border border-border/70 bg-card px-3 py-2",
+                      "text-left text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                      "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background outline-none",
+                    )}
+                  >
+                    <Search className="size-4" />
+                    <span className="flex-1">Search tasks, actions, pages…</span>
+                    <span className="rounded-md bg-muted px-2 py-0.5 text-[11px]">Ctrl K</span>
+                  </button>
+                </div>
 
-                <Button variant="default" size="sm" onClick={() => nav("/tasks?new=1")}>
-                  Start new task
-                </Button>
+                <div className="flex shrink-0 items-center gap-2">
+                  <div className="hidden lg:block">
+                    <ConnectionPill ws={dash.wsConnected} gateway={dash.gatewayConnected} />
+                  </div>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className="gap-2">
+                        {theme === "dark" ? <Moon /> : <Sun />}
+                        <span className="hidden sm:inline">Theme</span>
+                        <ChevronDown className="size-4 text-muted-foreground" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>Appearance</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onSelect={() => setTheme("system")}>System</DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => setTheme("dark")}>Dark</DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => setTheme("light")}>Light</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  <Button variant="default" size="sm" onClick={() => nav("/tasks?new=1")}>
+                    Start new task
+                  </Button>
+                </div>
               </div>
-            </div>
-          </header>
+            </header>
 
-          <main className="px-4 py-6 md:px-6">
-            <Outlet />
-          </main>
+            <main className="px-4 py-6 md:px-6">
+              <Outlet />
+            </main>
+          </div>
         </div>
+
+        <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
+        <Toaster />
       </div>
-    </div>
+    </ToastProviderState>
   );
 }
