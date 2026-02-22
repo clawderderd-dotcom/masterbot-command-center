@@ -1,5 +1,8 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { cn } from "../lib/utils";
+import { useTheme } from "../hooks/useTheme";
+import { useDashboard } from "../state/DashboardContext";
+import { Button } from "./ui/button";
 
 const navItems = [
   { to: "/", label: "Overview" },
@@ -14,6 +17,10 @@ const navItems = [
 ];
 
 export function Layout() {
+  const nav = useNavigate();
+  const { theme, setTheme } = useTheme();
+  const dash = useDashboard();
+
   return (
     <div className="min-h-dvh bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       <div className="flex min-h-dvh">
@@ -52,12 +59,37 @@ export function Layout() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <a
-                  href="/"
-                  className="rounded-md border px-3 py-2 text-xs hover:bg-slate-50 dark:hover:bg-slate-900"
+                <div className="hidden items-center gap-2 text-xs text-slate-500 md:flex">
+                  <span
+                    className={cn(
+                      "inline-block h-2 w-2 rounded-full",
+                      dash.wsConnected ? "bg-emerald-500" : "bg-slate-400",
+                    )}
+                    title={dash.wsConnected ? "Dashboard WS connected" : "Dashboard WS disconnected"}
+                  />
+                  <span
+                    className={cn(
+                      "inline-block h-2 w-2 rounded-full",
+                      dash.gatewayConnected ? "bg-emerald-500" : "bg-amber-500",
+                    )}
+                    title={dash.gatewayConnected ? "Gateway connected" : "Gateway disconnected"}
+                  />
+                </div>
+
+                <select
+                  className="h-9 rounded-md border border-slate-200 bg-white px-2 text-xs dark:border-slate-800 dark:bg-slate-950"
+                  value={theme}
+                  onChange={(e) => setTheme(e.target.value as any)}
+                  aria-label="Theme"
                 >
+                  <option value="system">System</option>
+                  <option value="light">Light</option>
+                  <option value="dark">Dark</option>
+                </select>
+
+                <Button variant="outline" size="sm" onClick={() => nav("/tasks?new=1")}>
                   Start new task
-                </a>
+                </Button>
               </div>
             </div>
           </header>

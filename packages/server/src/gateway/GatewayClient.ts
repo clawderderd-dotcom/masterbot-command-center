@@ -20,6 +20,19 @@ export type GatewayFrameRes = {
   payload?: unknown;
   error?: { code: string; message: string; details?: unknown; retryable?: boolean; retryAfterMs?: number };
 };
+
+export class GatewayError extends Error {
+  code?: string;
+  details?: unknown;
+  retryable?: boolean;
+  retryAfterMs?: number;
+
+  constructor(message: string, fields?: Partial<GatewayError>) {
+    super(message);
+    Object.assign(this, fields ?? {});
+  }
+}
+
 export type GatewayFrameEvent = {
   type: "event";
   event: string;
@@ -98,8 +111,8 @@ export class GatewayClient {
 
     this.ws = new WebSocket(this.opts.url);
     this.ws.on("open", () => this.queueConnect());
-    this.ws.on("message", (data) => this.handleMessage(String(data)));
-    this.ws.on("close", (code, buf) => {
+    this.ws.on("message", (data: WebSocket.RawData) => this.handleMessage(String(data)));
+    this.ws.on("close", (code: number, buf: Buffer) => {
       const reason = buf?.toString?.() ?? "";
       this.ws = null;
       this.flushPending(new Error(`gateway closed (${code}): ${reason}`));
@@ -254,7 +267,15 @@ export class GatewayClient {
       if (!pending) return;
       this.pending.delete(frame.id);
       if (frame.ok) pending.resolve(frame.payload);
-      else pending.reject(new Error(frame.error?.message ?? `request failed (${pending.method})`));
+      else {
+        const e = new GatewayError(frame.error?.message ?? `request failed (${pending.method})`, {
+          code: frame.error?.code,
+          details: frame.error?.details,
+          retryable: frame.error?.retryable,
+          retryAfterMs: frame.error?.retryAfterMs,
+        });
+        pending.reject(e);
+      }
       return;
     }
   }
