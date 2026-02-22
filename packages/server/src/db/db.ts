@@ -88,7 +88,11 @@ function migrate(db: Db) {
   const finalVer = db
     .prepare("SELECT value FROM meta WHERE key='schemaVersion'")
     .get() as { value: string };
-  if (Number(finalVer.value) !== target) {
-    throw new Error(`schema migration failed (expected ${target}, got ${finalVer.value})`);
+  const finalNum = Number(finalVer.value);
+
+  // Allow running against a newer schema (ex: leftover dev db from a prior version).
+  // We only guarantee that the minimum required schema is present.
+  if (finalNum < target) {
+    throw new Error(`schema migration failed (expected >=${target}, got ${finalVer.value})`);
   }
 }
