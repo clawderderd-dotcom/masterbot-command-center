@@ -6,5 +6,7 @@ packages/**/dist
 packages/**/.vite
 packages/**/coverage
 packages/**/tmp
-packages/server/data
-packages/server/backups
+packages/server/data/**
+packages/server/backups/**
+packages/server/**/data/**
+packages/server/**/backups/**
