@@ -1,0 +1,27 @@
+{
+  "name": "@mcc/server",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "lint": "node -e \"console.log('lint: (not configured)')\""
+  },
+  "dependencies": {
+    "@mcc/shared": "*",
+    "better-sqlite3": "^12.4.1",
+    "dotenv": "^16.6.1",
+    "fastify": "^5.2.1",
+    "fastify-plugin": "^5.0.1",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^22.18.0",
+    "tsx": "^4.20.5",
+    "typescript": "^5.8.2"
+  }
+}

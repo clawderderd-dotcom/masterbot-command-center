@@ -1,0 +1,20 @@
+{
+  "name": "masterbot-command-center",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n server,web -c blue,green \"npm -w @mcc/server run dev\" \"npm -w @mcc/web run dev\"",
+    "build": "npm -w @mcc/shared run build && npm -w @mcc/server run build && npm -w @mcc/web run build",
+    "start": "npm -w @mcc/server run start",
+    "lint": "npm -w @mcc/server run lint && npm -w @mcc/web run lint",
+    "format": "prettier -w ."
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0",
+    "prettier": "^3.6.2",
+    "typescript": "^5.8.2"
+  }
+}
