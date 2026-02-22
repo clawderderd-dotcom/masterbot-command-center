@@ -4,6 +4,7 @@ import { OverviewPage } from "./pages/Overview";
 import { TasksPage } from "./pages/Tasks";
 import { TaskDetailPage } from "./pages/TaskDetail";
 import { PlaceholderPage } from "./pages/Placeholder";
+import { DiagnosticsPage } from "./pages/Diagnostics";
 
 export function App() {
   return (
@@ -18,7 +19,7 @@ export function App() {
         <Route path="/skills" element={<PlaceholderPage title="Skills" />} />
         <Route path="/cron" element={<PlaceholderPage title="Automations" />} />
         <Route path="/logs" element={<PlaceholderPage title="Logs" />} />
-        <Route path="/diagnostics" element={<PlaceholderPage title="Diagnostics" />} />
+        <Route path="/diagnostics" element={<DiagnosticsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

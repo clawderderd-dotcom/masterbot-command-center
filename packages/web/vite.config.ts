@@ -6,6 +6,9 @@ export default defineConfig({
   server: {
     host: "127.0.0.1",
     port: 5173,
+    // Allow access via Cloudflare quick tunnels / other reverse proxies.
+    // Vite blocks unknown Host headers by default.
+    allowedHosts: [".trycloudflare.com"],
     proxy: {
       "/api": "http://127.0.0.1:8787",
       "/ws": {

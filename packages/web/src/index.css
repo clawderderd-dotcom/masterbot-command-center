@@ -1,10 +1,151 @@
 @import "tailwindcss";
 
+/*
+  Design system inspired by shadcn/ui, adapted for Tailwind v4 CSS-first config.
+  Tokens live in @theme and are consumed by utilities like bg-background, text-foreground, etc.
+*/
+
+@theme {
+  /* radii */
+  --radius: 0.75rem;
+
+  /* neutrals (dark-mode-first) */
+  --color-background: oklch(0.14 0.02 255);
+  --color-foreground: oklch(0.98 0.01 255);
+
+  --color-card: oklch(0.17 0.02 255);
+  --color-card-foreground: var(--color-foreground);
+
+  --color-popover: oklch(0.17 0.02 255);
+  --color-popover-foreground: var(--color-foreground);
+
+  --color-muted: oklch(0.22 0.02 255);
+  --color-muted-foreground: oklch(0.76 0.02 255);
+
+  --color-border: oklch(0.26 0.02 255);
+  --color-input: oklch(0.26 0.02 255);
+
+  --color-primary: oklch(0.86 0.13 200);
+  --color-primary-foreground: oklch(0.16 0.02 255);
+
+  --color-secondary: oklch(0.22 0.02 255);
+  --color-secondary-foreground: var(--color-foreground);
+
+  --color-accent: oklch(0.24 0.03 255);
+  --color-accent-foreground: var(--color-foreground);
+
+  --color-destructive: oklch(0.62 0.22 25);
+  --color-destructive-foreground: oklch(0.98 0.01 255);
+
+  --color-ring: oklch(0.86 0.13 200);
+
+  /* semantic */
+  --color-success: oklch(0.75 0.16 155);
+  --color-warning: oklch(0.82 0.16 80);
+  --color-info: oklch(0.78 0.14 240);
+
+  /* surfaces */
+  --color-sidebar: oklch(0.16 0.02 255);
+  --color-sidebar-foreground: var(--color-foreground);
+  --color-sidebar-muted: oklch(0.2 0.02 255);
+  --color-sidebar-accent: oklch(0.22 0.02 255);
+}
+
+/* Light theme override (still supported) */
+.light {
+  color-scheme: light;
+}
+.light {
+  --color-background: oklch(0.99 0 0);
+  --color-foreground: oklch(0.17 0.02 255);
+  --color-card: oklch(1 0 0);
+  --color-card-foreground: var(--color-foreground);
+  --color-popover: oklch(1 0 0);
+  --color-popover-foreground: var(--color-foreground);
+  --color-muted: oklch(0.96 0.01 255);
+  --color-muted-foreground: oklch(0.48 0.02 255);
+  --color-border: oklch(0.9 0.01 255);
+  --color-input: oklch(0.9 0.01 255);
+  --color-secondary: oklch(0.96 0.01 255);
+  --color-secondary-foreground: var(--color-foreground);
+  --color-accent: oklch(0.95 0.01 255);
+  --color-accent-foreground: var(--color-foreground);
+  --color-sidebar: oklch(0.985 0 0);
+  --color-sidebar-foreground: var(--color-foreground);
+  --color-sidebar-muted: oklch(0.96 0.01 255);
+  --color-sidebar-accent: oklch(0.95 0.01 255);
+}
+
 :root {
-  color-scheme: light dark;
+  color-scheme: dark;
 }
 
 html,
 body {
   height: 100%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  @keyframes mcc-fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes mcc-fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes mcc-zoom-in {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+  @keyframes mcc-zoom-out {
+    from {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.98);
+    }
+  }
+
+  .animate-fade-in {
+    animation: mcc-fade-in 140ms ease-out;
+  }
+  .animate-fade-out {
+    animation: mcc-fade-out 120ms ease-in;
+  }
+  .animate-zoom-in {
+    animation: mcc-zoom-in 160ms ease-out;
+  }
+  .animate-zoom-out {
+    animation: mcc-zoom-out 120ms ease-in;
+  }
 }

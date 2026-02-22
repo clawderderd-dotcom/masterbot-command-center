@@ -4,13 +4,18 @@ import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import { App } from "./App";
 import { DashboardProvider } from "./state/DashboardContext";
+import { ToastProviderState } from "./components/ui/use-toast";
+import { Toaster } from "./components/ui/toaster";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <DashboardProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </DashboardProvider>
+    <ToastProviderState>
+      <DashboardProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </DashboardProvider>
+      <Toaster />
+    </ToastProviderState>
   </StrictMode>,
 );

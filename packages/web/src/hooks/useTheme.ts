@@ -5,8 +5,12 @@ export type Theme = "light" | "dark" | "system";
 function applyTheme(theme: Theme) {
   const root = document.documentElement;
   const systemDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+
   const dark = theme === "dark" || (theme === "system" && systemDark);
+  const light = theme === "light";
+
   root.classList.toggle("dark", dark);
+  root.classList.toggle("light", light);
 }
 
 export function useTheme() {
